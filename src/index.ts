@@ -3,7 +3,7 @@ import cors from "cors";
 const pool = require('./db');
 
 const app = express();
-
+const port = process.env.PORT || 5000;
 app.use(express.json())
 app.use(cors())
 
@@ -21,6 +21,6 @@ app.get('/api/test', async (req, res) => {
     }
   });
 
-app.listen(5000, ()=>{
-    console.log("Server is running on port 5000")
+app.listen(port, ()=>{
+    console.log("Server is running on port " + process.env.PORT)
 })

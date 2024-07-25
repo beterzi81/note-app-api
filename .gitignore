@@ -63,5 +63,6 @@ ehthumbs.db
 *.pid
 *.seed
 *.pid.lock
+.env
 
 # End of `.gitignore` file
