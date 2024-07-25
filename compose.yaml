@@ -1,0 +1,13 @@
+version: "3.9"
+services:
+  db:
+    image: postgres:16.2
+    container_name: db_notes
+    environment:
+      - TZ=UTC
+      - PGTZ=UTC
+      - POSTGRES_DB=db_notes
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=password
+    ports:
+      - "5434:5432"
