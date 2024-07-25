@@ -17,10 +17,10 @@ app.get('/api/test', async (req, res) => {
       res.json(result.rows);
     } catch (err) {
       console.error(err);
-      res.status(500).json({ error: 'Internal Server Error' });
+      res.status(502).json({ error: 'Couldn\'t establish database connection' });
     }
   });
 
 app.listen(port, ()=>{
-    console.log("Server is running on port " + process.env.PORT)
+    console.log("Server is running on port " + port)
 })
