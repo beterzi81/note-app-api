@@ -10,44 +10,85 @@ app.use(express.json())
 app.use(cors())
 
 app.get("/api/notes" , async(req,res) =>{
-    const notes = await prisma.note.findMany()
-    res.json({notes})
+    const notes = await prisma.note.findMany({
+        orderBy:{
+            id: "desc"
+        }
+    })
+    res.json(notes)
 })
 
 app.post("/api/notes", async(req,res) =>{
     const {title, content} = req.body
-    const note = await prisma.note.create({
-        data:{
-            title,
-            content
-        }
-    })
-    res.json({note})
+
+    if (!title || !content){
+        return res.status(400).json({error: "Title and content are required"})
+    }
+
+    try {
+      const note = await prisma.note.create({
+          data:{
+              title,
+              content
+          }
+      })
+      res.json(note)
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({error: "Something went wrong"})
+    }
 })
 
 app.put("/api/notes/:id", async(req,res) =>{
-    const {id} = req.params
-    const {title, content} = req.body
-    const note = await prisma.note.update({
+    const id = parseInt(req.params.id)
+    var {title, content} = req.body
+    if(!id || isNaN(id)){
+        return res.status(400).json({error: "Id must be a valid number!"})
+    }
+    const originalNote = await prisma.note.findUnique({
         where:{
-            id: parseInt(id)
-        },
-        data:{
-            title,
-            content
+            id: id
         }
     })
-    res.json({note})
+    if(!originalNote){
+        return res.status(404).json({error: "Note not found"})
+    }
+
+    title = title || originalNote.title
+    content = content || originalNote.content
+    try {
+      const noteUpdated = await prisma.note.update({
+          where:{
+              id: id
+          },
+          data:{
+              title,
+              content
+          }
+      })
+      res.json(noteUpdated)
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({error: "Something went wrong"})
+    }
 })
 
 app.delete("/api/notes/:id", async(req,res) =>{
-    const {id} = req.params
-    const note = await prisma.note.delete({
-        where:{
-            id: parseInt(id)
-        }
-    })
-    res.json({message: "Note deleted"})
+  const id = parseInt(req.params.id)
+  if(!id || isNaN(id)){
+    return res.status(400).json({error: "Id must be a valid number!"})
+  }
+    try {
+      await prisma.note.delete({
+          where:{
+              id: id
+          }
+      })
+      res.status(204).send()
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({error: "Something went wrong"})
+    }
 })
 
 app.get('/api/test', async (req, res) => {
